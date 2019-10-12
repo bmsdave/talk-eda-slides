@@ -144,8 +144,9 @@ body {
   position: relative;
   width: 90%;
   margin: 20px auto;
+  height: 600px;
   text-align: left;
-  font-size: 0.55em;
+  font-size: 0.9em;
   font-family: monospace;
   line-height: 1.2em;
   word-wrap: break-word;
@@ -159,7 +160,8 @@ body {
   display: block;
   padding: 5px;
   overflow: auto;
-  max-height: 400px;
+  height: 600px;
+  max-height: 600px;
   word-wrap: normal; }
 
 .reveal table {

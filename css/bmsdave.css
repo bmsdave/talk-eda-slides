@@ -1,21 +1,32 @@
 * {
-    --a: red;
-    --b: #FF7F00;
-    --c: #CCCC00; 
-    --d: green;
-    --e: #96bf33;
-    --f: #0000FF;
-    --g: #4B0082;
-    --h: #8B00FF;
-}
-
-.reveal section img {
-    margin: 0;
-    border: none;
-    background: none;
-    box-shadow: none;
+  --a: red;
+  --b: #ff7f00;
+  --c: #cccc00;
+  --d: green;
+  --e: #96bf33;
+  --f: #0000ff;
+  --g: #4b0082;
+  --h: #8b00ff;
 }
 
 .backgrounds {
-    opacity: 0.35;
+  opacity: 0.35;
+}
+.reveal section img {
+  margin: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.reveal .grid {
+  display: grid;
+}
+
+.reveal .grid_img {
+  margin: auto;
+}
+
+.reveal .h200 {
+  height: 200px;
 }

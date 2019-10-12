@@ -2,384 +2,388 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-	<title>reveal.js</title>
+    <title>reveal.js</title>
 
-	<link rel="stylesheet" href="css/reset.css">
-	<link rel="stylesheet" href="css/reveal.css">
-	<link rel="stylesheet" href="css/theme/bmsdave.css">
-	<link rel="stylesheet" href="css/bmsdave.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/bmsdave.css">
+    <link rel="stylesheet" href="css/bmsdave.css">
 
-	<!-- Theme used for syntax highlighting of code -->
-	<link rel="stylesheet" href="lib/css/monokai.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/monokai.css">
 
-	<!-- Printing and PDF exports -->
-	<script>
-		var link = document.createElement('link');
-		link.rel = 'stylesheet';
-		link.type = 'text/css';
-		link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
-		document.getElementsByTagName('head')[0].appendChild(link);
-	</script>
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
 </head>
 
 <body>
-	<div class="reveal">
-		<div class="slides">
-			<section></section>
-			<!-- <section class="light" data-state="start" data-background-image="/assets/frontendconf.svg"> -->
-			<section data-state="start">
-				<span id="typed"></span>
-				<div id="typed-strings">
-					<span>
-						<h2>Event-Driven Architecture:<br>детали реализаций Event Loop</h2>
-						<ul>
-							<li>Вадим Горбачев</li>
-							<li>twitter: @_bmsdave</li>
-							<li>@bmsdave</li>
-						</ul>
-					</span>
-				</div>
-			</section>
-			<section data-background-image="/assets/0-plan.jpg">
-				<h2>План доклада:</h2>
-				<ul>
-					<!-- 7 пунктов -->
-					<li><a href="#webservers">1. История веб серверов</a></li>
-					<li><a href="#problems">2. Проблематика EDA</a></li>
-					<li><a href="#eventloop">4. Циклы событий</a></li>
-					<li><a href="#tools">5. Инструментарий</a></li>
-				</ul>
-			</section>
-			<section id="intro" data-background-image="/assets/1-red.jpg">
-				<section>
-					<h2>Event-Driven Architecture</h2>
-					<p>берет начало в 1970e</p>
-					<ul>
-						<li class="fragment fade-down">1. Генератор событий</li>
-						<li class="fragment fade-down">2. Канал событий</li>
-						<li class="fragment fade-down">3. Механизм обработки событий</li>
-						<li class="fragment fade-down">4. Последующее действие, управляемое событиями</li>
-					</ul>
-				</section>
-				<section>
-					<h2>Применение</h2>
-					<ul>
-						<li class="fragment fade-down">Основа всех (ну или почти всех) GUI</li>
-						<li class="fragment fade-down">Aльтернатива многопоточным приложениям</li>
-						<li class="fragment fade-down">Разработка игр</li>
-					</ul>
-				</section>
-			</section>
-			<section id="webservers" data-background-image="/assets/1-red.jpg">
-				<section data-state="apache_history" data-background-image="/assets/star-wars-background.jpg">
-					<div class="star-wars">
-						<div id="crawl">
-							<div class="title">
-								<p>Web Server</p>
-								<img src="/assets/apache_logo.svg"></img>
-								<h3>A New Hope</h3>
-							</div>
-							<p>Давным давно в далекой далекой галактике появился apache HTTP server
-								(созданный в 1995 году), так как это первый проект apache foundation,
-								его обычно называют просто apache.<br><br></p>
-							<p>Важную роль в apache выполняет модуль MPM (Multi-Processing Module),
-								который, грубо говоря, отвечает обработку нескольких запросов
-								несколькими процессами. Один из наиболее частых режимов использования
-								которого mpm_prefork.<br><br></p>
-							<p>Суть его в том, что на 1 запрос обрабатывает отдельный процесс с одним потоком.
-								В этом режиме может быть запущено определенное количество `X` процессов,
-								их количество, по большей части ограничивается RAM на сервере.
-								И как вы думаете, что произойдет если придет `X+1` запрос?
-								Верно, он будет ждать пока освободится процесс.<br><br>
-							</p>
-						</div>
-					</div>
-				</section>
-				<section>
-					<h2>apache Multi-Processing Module</h2>
-					<p>mpm_prefork</p>
-					<img class="fragment fade-down" src="/assets/apache_how_it_works.svg"></img>
-				</section>
-				<section>
-					<h2>Проблема такого подхода</h2>
-					<ul>
-						<li class="fragment fade-down">Затраты на переключение между процессами</li>
-						<li class="fragment fade-down">Рост потребляемой памяти
-							<!-- <img src="/assets/apache_memory.jpg"></img> -->
-						</li>
-					</ul>
-				</section>
-				<section>
-					<h2>load average</h2>
-					<img src="/assets/load_average.png"></img>
-				</section>
-				<section>
-					<h2>1999г. c10k</h2>
-					<p>
-						Ден Кегель, администратор FTP-сервера Simtel<br>
-						обозначил проблему c10k <a href="http://www.kegel.com/c10k.html">[1]</a>
-					</p>
-				</section>
-				<section>
-					<h2>2004г. <img src="/assets/nginx.svg"></img></h2>
-					<p>
-						<img height="600px" class="fragment fade-down" src="/assets/nginx_threadpool.png"></img>
-						<a href="https://habr.com/ru/post/260669/">[2]</a>
-					</p>
-				</section>
-				<section>
-					<h2>ngixn vs apache</h2>
-					<img height="600px" src="/assets/processing_requests.png"></img>
-				</section>
-				<section>
-					<h2>ngixn vs apache</h2>
-					<img src="/assets/nginx_apache_timeline.jpg"></img>
-				</section>
-				<section>
-					<h2>ngixn vs apache</h2>
-					<img src="/assets/nginx_apache_usage.jpg"></img>
-				</section>
-				<section>
-					<h2>2009г. <img height="100px" src="/assets/nodejs.svg"></img></h2>
-					<img height="600px" src="/assets/nodejs_process.jpg"></img>
-				</section>
-				<section>
-					<h2>Выгода</h2>
-					<ul>
-						<li class="fragment fade-down">"контроль" над CPU</li>
-						<li class="fragment fade-down">экономия RAM</li>
-						<li class="fragment fade-down">экономия на переключении контекстов</li>
-					</ul>
-				</section>
-			</section>
-			<section id="problems" data-background-image="/assets/2-orange.jpg">
-				<section>
-					<h2>Проблемы EDA</h2>
-				</section>
-				<section>
-					<h2>1. Проблемы удобства</h2>
-					<ul>
-						<li class="fragment fade-down">1. отсутствие call stack</li>
-						<li class="fragment fade-down"><img height="500px" src="/assets/call_vs_event.svg"></img></li>
-						<li class="fragment fade-down">2. сильно большая свобода</li>
-					</ul>
-				</section>
-				<section>
-					<h2>2. Отравление обработчика</h2>
-				</section>
-				<section data-transition="none">
-					<h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
-					<h3>O(x^2)</h3>
-					<pre><code class="hgjs">
-// Django
-const email_pattern = /^\S+@\S+\.\S+$/;
-email_pattern.test('@'.repeat(10)); // 0ms
-email_pattern.test('@'.repeat(100)); // 0ms
-email_pattern.test('@'.repeat(1000)); // 1ms
-email_pattern.test('@'.repeat(10000)); // 132ms
-email_pattern.test('@'.repeat(100000)); // 13506ms
-						</code></pre>
-				</section>
-				<section data-transition="none">
-					<h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
-					<h3>O(E^x)</h3>
-					<pre><code class="hgjs">
-// Microsoft project
-const user_pattern = /^[a-zA-Z0–9]+([._]?[a-zA-Z0–9]+)*$/;
+    <div class="reveal">
+        <div class="slides">
+            <section></section>
+            <!-- <section class="light" data-state="start" data-background-image="/assets/frontendconf.svg"> -->
+            <section data-state="start">
+                <span id="typed"></span>
+                <div id="typed-strings">
+                    <span>
+                        <h2>Event-Driven Architecture:<br>детали реализаций Event Loop</h2>
+                        <ul>
+                            <li>Вадим Горбачев</li>
+                            <li>twitter: @_bmsdave</li>
+                            <li>@bmsdave</li>
+                        </ul>
+                    </span>
+                </div>
+            </section>
+            <section data-background-image="/assets/0-plan.jpg">
+                <h2>План доклада:</h2>
+                <ul>
+                    <!-- 7 пунктов -->
+                    <li><a href="#webservers">1. История веб-серверов</a></li>
+                    <li><a href="#problems">2. Проблематика EDA</a></li>
+                    <li><a href="#eventloop">4. Циклы событий</a></li>
+                    <li><a href="#tools">5. Инструментарий</a></li>
+                </ul>
+            </section>
+            <section id="intro" data-background-image="/assets/1-red.jpg">
+                <section>
+                    <h2>Event-Driven Architecture</h2>
+                    <p>берет начало в 1970-e</p>
+                    <ul>
+                        <li class="fragment fade-down">1. Генератор событий</li>
+                        <li class="fragment fade-down">2. Канал событий</li>
+                        <li class="fragment fade-down">3. Механизм обработки событий</li>
+                        <li class="fragment fade-down">4. Последующее действие, управляемое событиями</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Применение</h2>
+                    <ul>
+                        <li class="fragment fade-down">Основа всех (ну или почти всех) GUI</li>
+                        <li class="fragment fade-down">Aльтернатива многопоточным приложениям</li>
+                        <li class="fragment fade-down">Разработка игр</li>
+                    </ul>
+                </section>
+            </section>
+            <section id="webservers" data-background-image="/assets/1-red.jpg">
+                <section data-state="apache_history" data-background-image="/assets/star-wars-background.jpg">
+                    <div class="star-wars">
+                        <div id="crawl">
+                            <div class="title">
+                                <p>Web Server</p>
+                                <img src="./assets/apache_logo.svg"></img>
+                                <h3>A New Hope</h3>
+                            </div>
+                            <p>Давным давно в далекой далекой галактике появился apache HTTP server
+                                (созданный в 1995 году), так как это первый проект apache foundation,
+                                его обычно называют просто apache.<br><br></p>
+                            <p>Важную роль в apache выполняет модуль MPM (Multi-Processing Module),
+                                который, грубо говоря, отвечает обработку нескольких запросов
+                                несколькими процессами. Один из наиболее частых режимов использования
+                                которого mpm_prefork.<br><br></p>
+                            <p>Суть его в том, что на 1 запрос обрабатывает отдельный процесс с одним потоком.
+                                В этом режиме может быть запущено определенное количество `X` процессов,
+                                их количество, по большей части ограничивается RAM на сервере.
+                                И как вы думаете, что произойдет если придет `X+1` запрос?
+                                Верно, он будет ждать пока освободится процесс.<br><br>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <h2>apache Multi-Processing Module</h2>
+                    <div class="grid">
+                        <p>mpm_prefork</p>
+                        <img class="fragment fade-down grid_img" src="./assets/apache_how_it_works.svg"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>Проблема такого подхода</h2>
+                    <ul>
+                        <li class="fragment fade-down">Затраты на переключение между процессами</li>
+                        <li class="fragment fade-down">Рост потребляемой памяти
+                            <!-- <img src="./assets/apache_memory.jpg"></img> -->
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>load average</h2>
+                    <img class="h200" src="./assets/load_average.png"></img>
+                </section>
+                <section>
+                    <h2>1999 г. c10k</h2>
+                    <p>
+                        Ден Кегель, администратор FTP-сервера Simtel<br>
+                        обозначил проблему c10k <a href="http://www.kegel.com/c10k.html">[1]</a>
+                    </p>
+                </section>
+                <section>
+                    <h2>2004 г. <img src="./assets/nginx.svg"></img></h2>
+                    <p class="grid">
+                        <img height="600px" class="fragment fade-down grid_img"
+                            src="./assets/nginx_threadpool.png"></img>
+                        <a href="https://habr.com/ru/post/260669/">[2]</a>
+                    </p>
+                </section>
+                <section>
+                    <h2>ngixn vs apache</h2>
+                    <div class="grid">
+                        <img height="600px" class="grid_img" src="./assets/processing_requests.png"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>ngixn vs apache</h2>
+                    <div class="grid">
+                        <img class="grid_img" src="./assets/nginx_apache_timeline.jpg"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>ngixn vs apache</h2>
+                    <div class="grid">
+                        <img class="grid_img" src="./assets/nginx_apache_usage.jpg"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>2009 г. <img height="100px" src="./assets/nodejs.svg"></img></h2>
+                    <div class="grid">
+                        <img class="grid_img" height="600px" src="./assets/nodejs_process.jpg"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>Выгода</h2>
+                    <ul>
+                        <li class="fragment fade-down">"контроль" над CPU</li>
+                        <li class="fragment fade-down">экономия RAM</li>
+                        <li class="fragment fade-down">экономия на переключении контекстов</li>
+                    </ul>
+                </section>
+            </section>
+            <section id="problems" data-background-image="/assets/2-orange.jpg">
+                <section>
+                    <h2>Проблемы EDA</h2>
+                </section>
+                <section>
+                    <h2>1. Проблемы удобства</h2>
+                    <div class="fragment fade-down grid">
+                        <ul>
+                            <li>1. отсутствие call stack</li>
+                            <li>2. сильно большая свобода</li>
+                        </ul>
+                        <img height="500px" class="grid_img" src="./assets/call_vs_event.svg"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>2. Отравление обработчика</h2>
+                </section>
+                <section data-transition="none">
+                    <h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
+                    <h3>O(n^2)</h3>
+                    <pre><code class="hgjs">// Django
+const email = /^\S+@\S+\.\S+$/;
+email.test('@'.repeat(10)); // 0ms
+email.test('@'.repeat(100)); // 0ms
+email.test('@'.repeat(1000)); // 1ms
+email.test('@'.repeat(10000)); // 132ms
+email.test('@'.repeat(100000)); // 13506ms</code></pre>
+                </section>
+                <section data-transition="none">
+                    <h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
+                    <h3>O(E^n)</h3>
+                    <pre><code class="hgjs">// Microsoft project
+const user = /^[a-zA-Z0–9]+([._]?[a-zA-Z0–9]+)*$/;
 
-user_pattern.test('a'.repeat(10));
-user_pattern.test('a'.repeat(100));
-user_pattern.test('a'.repeat(1000));
-user_pattern.test('a'.repeat(10000));
-user_pattern.test('a'.repeat(100000));
-</code></pre>
-				</section>
-				<section data-transition="none">
-					<h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
-					<h3>O(E^x)</h3>
-					<pre><code class="hgjs">
-// Microsoft project
-const user_pattern = /^[a-zA-Z0–9]+([._]?[a-zA-Z0–9]+)*$/;
+user.test('a'.repeat(10));
+user.test('a'.repeat(100));
+user.test('a'.repeat(1000));
+user.test('a'.repeat(10000));
+user.test('a'.repeat(100000));</code></pre>
+                </section>
+                <section data-transition="none">
+                    <h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
+                    <h3>O(E^n)</h3>
+                    <pre><code class="hgjs">// Microsoft project
+const user = /^[a-zA-Z0–9]+([._]?[a-zA-Z0–9]+)*$/;
 
-user_pattern.test('a'.repeat(10)); // 0ms
-user_pattern.test('a'.repeat(100)); // 0ms
-user_pattern.test('a'.repeat(1000)); // 0ms
-user_pattern.test('a'.repeat(10000)); // 0ms
-user_pattern.test('a'.repeat(100000)); // 1ms
-</code></pre>
-				</section>
-				<section data-transition="none">
-					<h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
-					<h3>O(E^x)</h3>
-					<pre><code class="hgjs">
-// Microsoft project
-const user_pattern = /^[a-zA-Z0–9]+([._]?[a-zA-Z0–9]+)*$/;
+user.test('a'.repeat(10)); // 0ms
+user.test('a'.repeat(100)); // 0ms
+user.test('a'.repeat(1000)); // 0ms
+user.test('a'.repeat(10000)); // 0ms
+user.test('a'.repeat(100000)); // 1ms</code></pre>
+                </section>
+                <section data-transition="none">
+                    <h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
+                    <h3>O(E^n)</h3>
+                    <pre><code class="hgjs">// Microsoft project
+const user = /^[a-zA-Z0–9]+([._]?[a-zA-Z0–9]+)*$/;
 
-user_pattern.test('a'.repeat(10) + "!"); // 1ms
-user_pattern.test('a'.repeat(15) + "!"); // 10ms
-user_pattern.test('a'.repeat(20) + "!"); // 335ms
+user.test('a'.repeat(10) + "!"); // 1ms
+user.test('a'.repeat(15) + "!"); // 10ms
+user.test('a'.repeat(20) + "!"); // 335ms
+user.test('a'.repeat(25) + "!"); // 675ms
+user.test('a'.repeat(30) + "!"); // 11587ms</code></pre>
+                </section>
+                <section data-transition="none">
+                    <h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
+                    <h3>Решение</h3>
+                    <ul>
+                        <li>Замена на строковые операции</li>
+                        <li>Ограничение длины</li>
+                        <li>Ревизия regexp</li>
+                    </ul>
+                </section>
+                <section data-transition="none">
+                    <h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
+                    <h3>O(E^n)</h3>
+                    <pre><code class="hgjs">// Microsoft project
+const user =
+/^[a-zA-Z0–9]{1}[._a-zA-Z0–9]*[a-zA-Z0–9]{1}$/;
 
-user_pattern.test('a'.repeat(25) + "!"); // 675ms
-user_pattern.test('a'.repeat(30) + "!"); // 11587ms
-</code></pre>
-				</section>
-				<section data-transition="none">
-					<h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
-					<h3>Решение</h3>
-					<ul>
-						<li>Замена на строковые операции</li>
-						<li>Ограничение длинны</li>
-						<li>Ревизия regexp</li>
-					</ul>
-				</section>
-				<section data-transition="none">
-					<h2>2.1. ReDoS<a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3]</a></h2>
-					<h3>O(E^x)</h3>
-					<pre><code class="hgjs">
-// Microsoft project
-const user_pattern = /^([a-zA-Z0–9]*|[a-zA-Z0–9]{1}[._a-zA-Z0–9]*[a-zA-Z0–9]{1})$/;
-
-user_pattern.test('a'.repeat(10) + "!"); // 0ms
-user_pattern.test('a'.repeat(15) + "!"); // 0ms
-user_pattern.test('a'.repeat(20) + "!"); // 0ms
-
-user_pattern.test('a'.repeat(25) + "!"); // 0ms
-user_pattern.test('a'.repeat(30) + "!"); // 0ms
-</code></pre>
-				</section>
-				<section>
+user.test('a'.repeat(10) + "!"); // 0ms
+user.test('a'.repeat(15) + "!"); // 0ms
+user.test('a'.repeat(20) + "!"); // 0ms
+user.test('a'.repeat(25) + "!"); // 0ms
+user.test('a'.repeat(30) + "!"); // 0ms</code></pre>
+                </section>
+                <section>
 					<h2>3. Падение очереди на обработке одного события</h2>
-				</section>
-				<section>
-					<h2>Проблемы EDA</h2>
-					<ul>
-						<li>1. Проблемы удобства</li>
-						<li>2. Отравление обработчика</li>
-						<li>3. Падение очереди на обработке одного события</li>
-					</ul>
-				</section>
-			</section>
-			<section id="libuv" data-background-image="/assets/3-green.jpg">
-				<section>
-					<h2><a href="https://github.com/libuv/libuv/wiki/Projects-that-use-libuv">[4]</a>libuv <img
-							height="160px" src="/assets/libuv.png"></img></h2>
-					<ul>
-						<li>15000 строк кода</li>
-						<li><img src="/assets/libuv_overview.png"></img></li>
-					</ul>
-				</section>
-				<section>
-					<h2>uv_run <a href="https://habr.com/ru/post/336498/">[5]</a></h2>
-					<pre class="hgcpp"><code>int uv_run(uv_loop_t* loop, uv_run_mode mode) {
-  /* *** */
+					<p class="fragment fade-down">Обязывает реализовывать "retry"</p>
+                </section>
+                <section>
+                    <h2>Проблемы EDA</h2>
+                    <ul>
+                        <li>1. Проблемы удобства</li>
+                        <li>2. Отравление обработчика</li>
+                        <li>3. Падение очереди на обработке одного события</li>
+                    </ul>
+                </section>
+            </section>
+            <section id="libuv" data-background-image="/assets/3-green.jpg">
+                <section>
+                    <h2><a href="https://github.com/libuv/libuv/wiki/Projects-that-use-libuv">[4]</a>libuv <img
+                            height="160px" src="./assets/libuv.png"></img></h2>
+                    <div class="grid">
+                        <p>15000 строк кода</p>
+                        <img class="grid_img" src="./assets/libuv_overview.png"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>uv_run <a href="https://habr.com/ru/post/336498/">[5]</a></h2>
+                    <pre class="hgcpp"><code>int uv_run(uv_loop_t* loop, uv_run_mode mode) {
   while (r != 0 && loop->stop_flag == 0) {
     uv__update_time(loop);
     uv__run_timers(loop);
     ran_pending = uv__run_pending(loop);
     uv__run_idle(loop);
     uv__run_prepare(loop);
-	/* *** */
+    /* *** */
     uv__io_poll(loop, timeout);
     uv__run_check(loop);
     uv__run_closing_handles(loop);
     /* *** */
   }</code></pre>
-				</section>
-				<section>
-					<h2>Как вы думаете где в libuv реализация microtasks и nextTick?</h2>
-				</section>
-				<section>
-					<h2>Что можно заметить</h2>
-					<ul>
-						<li>Нет приоритезации</li>
-						<li>Обход является синхронным</li>
-					</ul>
-				</section>
-			</section>
-			<section id="eventloop" data-background-image="/assets/3-green.jpg">
-				<section>
-					<h2>Другие реализациии</h2>
-					<ul>
-						<li>Tokio.rs (Rust)
-							<img width="200" src="/assets/tokiors.png"></img>
-						</li>
-						<li>Data Kernel (Java)
-							<img width="200" src="/assets/data-kernel.png"></img>
-						</li>
-						<li>Vert.x (Java)
-						</li>
-				</section>
-				<section>
-					<h2>Мотивация использовать tokio в deno</h2>
-					<img src="/assets/libuv_vs_tokio.png"></img>
-				</section>
-				<section>
-					<h2>Event loop в браузерах</h2>
-				</section>
-				<section>
-					<h2>whatwg <a href="https://github.com/atotic/event-loop">[6]</a></h2>
-					<pre><code class="hljs">eventLoop = {
-    taskQueues: {},
-    microtaskQueue: [],
+                </section>
+                <section>
+                    <h2>Как вы думаете где в libuv реализация microtasks и nextTick?</h2>
+                </section>
+                <section>
+                    <h2>Что можно заметить</h2>
+                    <ul>
+                        <li>Нет приоритизации</li>
+                        <li>Обход является синхронным</li>
+                    </ul>
+                </section>
+            </section>
+            <section id="eventloop" data-background-image="/assets/3-green.jpg">
+                <section>
+                    <h2>Другие реализациии</h2>
+                    <ul>
+                        <li>Tokio.rs (Rust)
+                            <img width="200" src="./assets/tokiors.png"></img>
+                        </li>
+                        <li>Data Kernel (Java)
+                            <img width="200" src="./assets/data-kernel.png"></img>
+                        </li>
+                        <li>Vert.x (Java)
+                        </li>
+                </section>
+                <section>
+                    <h2>Мотивация использовать tokio в deno</h2>
+                    <div class="grid">
+                        <img class="grid_img" src="./assets/libuv_vs_tokio.png"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>Event loop в браузерах</h2>
+                </section>
+                <section>
+                    <h2>whatwg <a href="https://github.com/atotic/event-loop">[6]</a></h2>
+                    <pre><code class="hljs">
+    eventLoop = {
+        taskQueues: {},
+        microtaskQueue: [],
 
-    nextTask: function() {},
-    executeMicrotasks: function() {},
-    needsRendering: function() {},
+        nextTask: function() {},
+        executeMicrotasks: function() {},
+        needsRendering: function() {},
 
-    render: function() {}
-}
+        render: function() {}
+    }
 
-while(true) {
-}</code></pre>
-				</section>
-				<section>
-					<h2>taskQueues</h2>
-					<pre><code  class="hljs">
+    while(true) {}</code></pre>
+                </section>
+                <section>
+                    <h2>tasks/microtasks</h2>
+                    <pre><code  class="hljs">
     taskQueues: {
-        events: [], // UI events from native GUI framework
+        events: [], // UI events
         parser: [], // HTML parser
         callbacks: [], // setTimeout, requestIdleTask
         resources: [], // image loading
         domManipulation[]
-	},
+    },
     microtaskQueue: []
-						</code></pre>
-				</section>
-				<section>
-					<h2>loop</h2>
-					<pre><code  class="hljs">
-while(true) {
-    task = eventLoop.nextTask();
-    if (task) {
-        task.execute();
-    }
-    eventLoop.executeMicrotasks();
-    if (eventLoop.needsRendering())
-        eventLoop.render();
-}
-							</code></pre>
-				</section>
-				<section>
-					<h2>nextTask</h2>
-					<pre><code  class="hljs">
+                        </code></pre>
+                </section>
+                <section>
+                    <h2>loop</h2>
+                    <pre><code  class="hljs">
+    while(true) {
+        task = eventLoop.nextTask();
+        if (task) {
+            task.execute();
+        }
+        eventLoop.executeMicrotasks();
+        if (eventLoop.needsRendering())
+            eventLoop.render();
+    }</code></pre>
+                </section>
+                <section>
+                    <h2>nextTask</h2>
+                    <pre><code  class="hljs">
     nextTask: function() {
         // Spec says:
-        // "Select the oldest task on one of the event loop's task queues"
-        // Which gives browser implementers lots of freedom
+        // "Select the oldest task on one
+        // of the event loop's task queues"
+        // Which gives browser
+        // implementers lots of freedom
         // Queues can have different priorities, etc.
         for (let q of taskQueues)
             if (q.length > 0)
                 return q.shift();
         return null;
-    },
-								</code></pre>
-				</section>
-				<section>
-					<h2>render</h2>
-					<pre><code class="hljs">render: function() {
+    }</code></pre>
+                </section>
+                <section>
+                    <h2>render</h2>
+                    <pre><code class="hljs">render: function() {
         dispatchPendingUIEvents();
         resizeSteps();
         scrollSteps();
@@ -388,119 +392,121 @@ while(true) {
         fullscreenRenderingSteps();
         animationFrameCallbackSteps();
         while (resizeObserverSteps()) {
-            updateStyle();
-            updateLayout();}
+            updateStyle(); updateLayout();}
         intersectionObserverObserves();
         paint();
     }</code></pre>
-				</section>
-				<section>
-					<h2>Все ли придерживаются спеки? <span class="fragment fade-down">Почти</span></h2>
-				</section>
-				<section>
-					<h2>whatwg support <a href="https://cdn.rawgit.com/atotic/event-loop/caa3cfd4/shell.html">[7]</a></h2>
-					<p>
-						<img src="/assets/whatwg_support.png"></img>
-					</p>
-				</section>
-				<!-- <section>
-					<video src="./assets/chrome_tasks_run.webm" autoplay controls muted></video>
-				</section>
-				<section>
-					<video src="./assets/different_st_raf_qt.webm" autoplay controls muted></video>
-				</section> -->
-			</section>
-			<section id="puzlers" data-background-image="/assets/3-green.jpg">
-				<section>
-					<h2>puzlers</h2>
-				</section>
-				<section>
-					<h2>пример 1</h2>
-					<pre><code class="hgjs">new MutationObserver(function() {
+                </section>
+                <section>
+                    <h2>Все ли придерживаются спеки? <span class="fragment fade-down">Почти</span></h2>
+                </section>
+                <section>
+                    <h2>whatwg support <a href="https://cdn.rawgit.com/atotic/event-loop/caa3cfd4/shell.html">[7]</a>
+                    </h2>
+                    <div class="grid">
+                        <img class="grid_img" src="./assets/whatwg_support.png"></img>
+                    </div>
+                </section>
+                <!-- <section>
+                    <video src="./assets/chrome_tasks_run.webm" autoplay controls muted></video>
+                </section>
+                <section>
+                    <video src="./assets/different_st_raf_qt.webm" autoplay controls muted></video>
+                </section> -->
+            </section>
+            <section id="puzlers" data-background-image="/assets/3-green.jpg">
+                <section>
+                    <h2>puzlers</h2>
+                </section>
+                <section>
+                    <div id="outer"
+                        style="width: 100px; height: 100px; background: aqua; display: grid; grid-gap: 15px; justify-content: center;">
+                        <div id="inner" style="width: 50px;  height: 50px; background: blue; margin: auto"></div>
+                    </div>
+                    <pre><code class="hgjs">new MutationObserver(function() {
   console.log('mutate');
 }).observe(outer, {attributes: true});
 
 function onClick() {
   console.log('click');
-  setTimeout(function() {console.log('timeout');}, 0);
-  Promise.resolve().then(function() {console.log('promise');});
+  setTimeout(()=>{console.log('timeout');}, 0);
+  Promise.resolve().then(()=>{console.log('promise')})
   outer.setAttribute('data-random', Math.random());
 }
 
 inner.addEventListener('click', onClick);
 outer.addEventListener('click', onClick);</code></pre>
-					<p>
-						<div id="outer"
-							style="width: 100px; height: 100px; background: aqua; display: grid; grid-gap: 15px; justify-content: center;">
-							<div id="inner" style="width: 50px;  height: 50px; background: blue; margin: auto"></div>
-						</div>
-					</p>
-				</section>
-				<section>
-					<ul>
-						<li>click</li>
-						<li>promise</li>
-						<li>mutate</li>
-						<li>click</li>
-						<li>promise</li>
-						<li>mutate</li>
-						<li>timeout</li>
-						<li>timeout</li>
-					</ul>
-				</section>
-				<section>
-					<img height="500px" src="/assets/wrong_answer1.png"></img>
-				</section>
-				<section>
-					<ul>
-						<li>click</li>
-						<li>promise</li>
-						<li>mutate</li>
-						<li>click</li>
-						<li>promise</li>
-						<li>mutate</li>
-						<li>timeout</li>
-						<li>timeout</li>
-					</ul>
-				</section>
-				<section>
-					<h2>Пример с тестами и <button style="font-size: 64px" id="test5">button.click()</button></h2>
-					<pre><code>
-		const button = document.getElementById('test5');
+                </section>
+                <section>
+                    <h2>Ожидания</h2>
+                    <ul>
+                        <li>click</li>
+                        <li>promise</li>
+                        <li>mutate</li>
+                        <li>click</li>
+                        <li>promise</li>
+                        <li>mutate</li>
+                        <li>timeout</li>
+                        <li>timeout</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2 class="fragment fade-down">2015г.</h2>
+                    <div class="grid">
+                        <img class="grid_img" height="700px" src="./assets/wrong_answer1.png"></img>
+                    </div>
+                </section>
+                <section>
+                    <h2>2019г.</h2>
+                    <ul>
+                        <li>click</li>
+                        <li>promise</li>
+                        <li>mutate</li>
+                        <li>click</li>
+                        <li>promise</li>
+                        <li>mutate</li>
+                        <li>timeout</li>
+                        <li>timeout</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Пример с тестами и <button style="font-size: 64px" id="test5">button.click()</button></h2>
+                    <pre><code>
+const button = document.getElementById('test5');
 
-		button.addEventListener('click', () => {
-			Promise.resolve().then(()=>console.log('microtask 1'));
-			console.log('listener 1')
-		});
+button.addEventListener('click', () => {
+  Promise.resolve().then(()=>console.log('mtask 1'));
+  console.log('listener 1');
+});
 
-		button.addEventListener('click', () => {
-			Promise.resolve().then(()=>console.log('microtask 2'));
-			console.log('listener 2')
-		})
-					</code></pre>
-				</section>
-				<section>
-					<h2>Есть ли у нас инструменты анализировать event loop?</h2>
-				</section>
-			</section>
-			<section id="tools" data-background-image="/assets/4-blue.jpg">
-				<section>
-					<h2>tools</h2>
-				</section>
-				<section>
-					<h2><a href="https://github.com/libuv/libuv/pull/1764">1764</a></h2>
-					<img src="/assets/1764.png"></img>
-				</section>
-				<section>
-					<h2>В Node.js</h2>
-					<pre><code class="hgjs" >
-process._getActiveRequests();
-process._getActiveHandles();
-					</code></pre>
-				</section>
-				<section>
-					<h2>В Node.js</h2>
-					<pre><code class="hgjs" >
+button.addEventListener('click', () => {
+  Promise.resolve().then(()=>console.log('mtask 2'));
+  console.log('listener 2');
+});
+                    </code></pre>
+                </section>
+                <section>
+                    <h2>Есть ли у нас инструменты анализировать event loop?</h2>
+                </section>
+            </section>
+            <section id="tools" data-background-image="/assets/4-blue.jpg">
+                <section>
+                    <h2>tools</h2>
+                </section>
+                <section>
+                    <h2><a href="https://github.com/libuv/libuv/pull/1764">1764</a></h2>
+                    <img height="300px" src="./assets/1764.png"></img>
+                </section>
+                <section>
+                    <h2>В Node.js</h2>
+                    <pre><code class="hgjs" >
+    process._getActiveRequests();
+    process._getActiveHandles();
+                    </code></pre>
+                </section>
+                <section>
+                    <h2>В Node.js</h2>
+                    <pre><code class="hgjs" >
 -------------------
 handles: [ WriteStream {
     connecting: false,
@@ -680,18 +686,20 @@ handles: [ WriteStream {
        _timer: [Circular] } } ]
 requests: []
 -------------------
-						</code></pre>
-					<p>
-						Node11: Timer objects no longer show up in process._getActiveHandles()
-						<a href="https://github.com/nodejs/node/issues/25806">[8]</a>
-					</p>
-				</section>
-				<section>
-					<h2>wtf Node.js?</h2>
-				</section>
-				<section>
-					<h2>wtfnode</h2>
-					<pre><code>[i] app/24191 on devbox: Server listening on 0.0.0.0:9001 in development mode
+                        </code></pre>
+                </section>
+                <section>
+                    <h2>
+                        Node11: Timer objects no longer show up in process._getActiveHandles()
+                        <a href="https://github.com/nodejs/node/issues/25806">[8]</a>
+                    </h2>
+                </section>
+                <section>
+                    <h2>wtf Node.js?</h2>
+                </section>
+                <section>
+                    <h2>wtfnode</h2>
+                    <pre><code style="font-size: 24px">[i] app/24191 on devbox: Server listening on 0.0.0.0:9001 in development mode
 ^C[WTF Node?] open handles:
 - Sockets:
   - 10.21.1.16:37696 -> 10.21.2.213:5432
@@ -704,152 +712,181 @@ requests: []
 - Timers:
   - (10000 ~ 10 s) wrapper @ ../knex/node_modules/pool2/lib/pool.js:80
   - (300000 ~ 5 min) wrapper @ /home/me/app/services/foo.service.js:61</code></pre>
-				</section>
-				<section>
-					<h2>Иногда Node.js не останавливается</h2>
-					<ul>
-						<li>gulp tasks</li>
-						<li>lambda functions</li>
-					</ul>
-				</section>
-				<section>
-					<h2>Why is node running?</h2>
-				</section>
-				<section>
-					<h2>why-is-node-running</h2>
-					<pre><code>There are 5 handle(s) keeping the process running
+                </section>
+                <section>
+                    <h2>Иногда Node.js не останавливается</h2>
+                    <ul>
+                        <li>gulp tasks</li>
+                        <li>lambda functions</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Why is node running?</h2>
+                </section>
+                <section>
+                    <h2>why-is-node-running</h2>
+                    <pre><code style="font-size: 24px">There are 5 handle(s) keeping the process running
 # Timeout
-/home/maf/dev/node_modules/why-is-node-running/example.js:6  - setInterval(() => {}, 100)
-/home/maf/dev/node_modules/why-is-node-running/example.js:10 - createServer()
+./node_modules/why-is-node-running/example.js:6  - setInterval(() => {}, 100)
+./node_modules/why-is-node-running/example.js:10 - createServer()
 
 # TCPSERVERWRAP
-/home/maf/dev/node_modules/why-is-node-running/example.js:7  - server.listen(0)
-/home/maf/dev/node_modules/why-is-node-running/example.js:10 - createServer()
+./node_modules/why-is-node-running/example.js:7  - server.listen(0)
+./node_modules/why-is-node-running/example.js:10 - createServer()
 
 # Timeout
-/home/maf/dev/node_modules/why-is-node-running/example.js:13 - setTimeout(function () {</code></pre>
+./node_modules/why-is-node-running/example.js:13 - setTimeout(function () {</code></pre>
+                </section>
+                <section>
+                    <h2>Demo с devtools и timeline</h2>
+                </section>
+            </section>
+            <section id="solution" data-background-image="/assets/4-blue.jpg">
+                <section>
+					<h2>fuzzing</h2>
+					<p>Что бы решить проблему, нужно ее найти</p>
+                </section>
+				<section>
+					<h2>Demo API login+pass</h2>
+				</section>
+                <section>
+					<h2>TODO: requests</h2>
+					<pre>
+$ node ./attaker.js 
+v7 917
+v7_wrong 40
+v7_wrong2 39
+					</pre>
 				</section>
 				<section>
-					<h2>Demo с devtools и timeline</h2>
-				</section>
-			</section>
-			<!-- <section id="solution" data-background-image="/assets/4-blue.jpg">
-				<section>
-					<h2>Fuzing</h2>
+						<h2>TODO: таким образом мы познакомились с тайминговыми атаками</h2>
+					</section>
+                <section>
+                    <h2>TODO: загрузить event loop запросами чтобы он не мог отвечать и показать как будет вести себя интерфейс</h2>
 				</section>
 				<section>
-					ReDOS
+						<h2>TODO: выводы о примере и решение</h2>
+						<ul>
+							<li>1. полностью обезопасить себя от отравлении не получится</li>
+							<li>2. мотивация для использования load balancer и горизонтальное маштабирование</li>
+						</ul>
 				</section>
 				<section>
-					KO: Самый очевидный кейс - это высвободить основной обработчик.
-					Переписать все на воркеры и прочее
+					<h2>Кстати, для клиентского fuzzing</h2>
+					<div class="grid">
+							<img class="grid_img" src="./assets/gremlins.gif"></img>
+					</div>
 				</section>
 				<section>
-					<h2>использование fibers</h2>
+						<h2>Кстати, для клиентского fuzzing</h2>
+						<pre><code>
+var horde = gremlins.createHorde();
+horde.unleash();
+// gremlins will act randomly,
+// at 10 ms interval, 1000 times
+						</code></pre>
 				</section>
-				<section>
-					ReDOS показать пример.
-				</section>
-				<section>
-					Что бы решить проблему, нужно ее найти
-					TODO: fuzzing
-				</section>
-			</section> -->
-			<section>
-				<h2>Выводы</h2>
-				<ul>
-					<li class="fragment fade-down">1. EDA принесла не только производительность но и проблемы</li>
-					<li class="fragment fade-down">2. Некоторые операции могут неожиданно заблокировать поток (ReDos)</li>
-					<li class="fragment fade-down">3. Реализации event loop "похожи"</li>
-					<li class="fragment fade-down">4. Есть необходимость в инструментах</li>
-				</ul>
-			</section>
-			<section>
-				<h2>список литературы</h2>
-				<ul>
-						<li><a href="http://www.kegel.com/c10k.html">[1] The C10K problem</a></li>
-						<li><a href="https://habr.com/ru/post/260669/">[2] Пулы потоков: ускоряем NGINX в 9 и более раз</a></li>
-						<li><a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3] The Impact of ReDoS in Practice</a></li>
-						<li><a href="https://github.com/libuv/libuv/wiki/Projects-that-use-libuv">[4] Projects that use libuv</a></li>
-						<li><a href="https://habr.com/ru/post/336498/">[5] Знай свой инструмент: Event Loop в libuv</a></li>
-						<li><a href="https://github.com/atotic/event-loop">[6] Event loop explainer</a></li>
-						<li><a href="https://cdn.rawgit.com/atotic/event-loop/caa3cfd4/shell.html">[7] Browser support test</a></li>
-						<li><a href="https://github.com/nodejs/node/issues/25806">[8] Timer objects no longer show up in process._getActiveHandles()</a></li>
-				</ul>
-			</section>
-			<section>
-				<h2>Спасибо!</h2>
-			</section>
-		</div>
-	</div>
+            </section>
+            <section>
+                <h2>Выводы</h2>
+                <ul>
+                    <li class="fragment fade-down">1. EDA принесла не только производительность, но и проблемы</li>
+                    <li class="fragment fade-down">2. Некоторые операции могут неожиданно заблокировать поток (ReDos)</li>
+                    <li class="fragment fade-down">3. Реализации event loop "похожи"</li>
+                    <li class="fragment fade-down">4. Есть необходимость в инструментах</li>
+                </ul>
+            </section>
+            <section>
+                <h2>список литературы</h2>
+                <ul>
+                    <li><a href="http://www.kegel.com/c10k.html">[1] The C10K problem</a></li>
+                    <li><a href="https://habr.com/ru/post/260669/">[2] Пулы потоков: ускоряем NGINX в 9 и более раз</a>
+                    </li>
+                    <li><a href="https://medium.com/@davisjam/introduction-987fdc4c7b0">[3] The Impact of ReDoS in
+                            Practice</a></li>
+                    <li><a href="https://github.com/libuv/libuv/wiki/Projects-that-use-libuv">[4] Projects that use
+                            libuv</a></li>
+                    <li><a href="https://habr.com/ru/post/336498/">[5] Знай свой инструмент: Event Loop в libuv</a></li>
+                    <li><a href="https://github.com/atotic/event-loop">[6] Event loop explainer</a></li>
+                    <li><a href="https://cdn.rawgit.com/atotic/event-loop/caa3cfd4/shell.html">[7] Browser support
+                            test</a></li>
+                    <li><a href="https://github.com/nodejs/node/issues/25806">[8] Timer objects no longer show up in
+                            process._getActiveHandles()</a></li>
+                </ul>
+            </section>
+            <section>
+                <h2>Спасибо!</h2>
+            </section>
+        </div>
+    </div>
 
-	<script src="js/reveal.js"></script>
+    <script src="js/reveal.js"></script>
 
-	<script>
-		// More info about config & dependencies:
-		// - https://github.com/hakimel/reveal.js#configuration
-		Reveal.configure({ slideNumber: true, history: true });
+    <script>
+        // More info about config & dependencies:
+        // - https://github.com/hakimel/reveal.js#configuration
+        Reveal.configure({ slideNumber: true, history: true });
 
-		Reveal.initialize({
-			width: 1400,
-			height: 800,
-			dependencies: [
-				// - https://github.com/hakimel/reveal.js#dependencies
-				{ src: 'plugin/markdown/marked.js' },
-				{ src: 'plugin/markdown/markdown.js' },
-				{ src: 'plugin/reveal-alt-arrows/alt-arrows.js' },
-				{ src: 'plugin/notes/notes.js', async: true },
-				{ src: 'plugin/highlight/highlight.js', async: true },
+        Reveal.initialize({
+            width: 1400,
+            height: 800,
+            dependencies: [
+                // - https://github.com/hakimel/reveal.js#dependencies
+                { src: 'plugin/markdown/marked.js' },
+                { src: 'plugin/markdown/markdown.js' },
+                { src: 'plugin/reveal-alt-arrows/alt-arrows.js' },
+                { src: 'plugin/notes/notes.js', async: true },
+                { src: 'plugin/highlight/highlight.js', async: true },
 
-				// custom plugins
-				// { src: 'plugin/bmsdave/bundle.js', async: true },
-				{ src: 'plugin/typed/typed.js', async: false, callback: function () { callTypedJs(); } },
-				// { src: 'plugin/vivus/index.js', async: false, callback: function () { callTypedJs(); } },
-				// { src: 'plugin/anime/index.js', async: false },
-			]
-		});
+                // custom plugins
+                // { src: 'plugin/bmsdave/bundle.js', async: true },
+                { src: 'plugin/typed/typed.js', async: false, callback: function () { callTypedJs(); } },
+                // { src: 'plugin/vivus/index.js', async: false, callback: function () { callTypedJs(); } },
+                // { src: 'plugin/anime/index.js', async: false },
+            ]
+        });
 
-		Reveal.addEventListener('apache_history', function () {
-			const crawl = document.getElementById('crawl');
-			crawl.classList.add("crawl");
-		}, false);
+        Reveal.addEventListener('apache_history', function () {
+            const crawl = document.getElementById('crawl');
+            crawl.classList.add("crawl");
+        }, false);
 
-		const button = document.getElementById('test5');
+        const button = document.getElementById('test5');
 
-		button.addEventListener('click', () => {
-			Promise.resolve().then(() => console.log('microtask 1'));
-			console.log('listener 1')
-		});
+        button.addEventListener('click', () => {
+            Promise.resolve().then(() => console.log('microtask 1'));
+            console.log('listener 1')
+        });
 
-		button.addEventListener('click', () => {
-			Promise.resolve().then(() => console.log('microtask 2'));
-			console.log('listener 2')
-		})
+        button.addEventListener('click', () => {
+            Promise.resolve().then(() => console.log('microtask 2'));
+            console.log('listener 2')
+        })
 
-// Let's get hold of those elements
-var outer = document.getElementById('outer');
-var inner = document.getElementById('inner');
+        // Let's get hold of those elements
+        var outer = document.getElementById('outer');
+        var inner = document.getElementById('inner');
 
-// Let's listen for attribute changes on the
-// outer element
-new MutationObserver(function() {
-  console.log('mutate');
-}).observe(outer, {attributes: true});
+        // Let's listen for attribute changes on the
+        // outer element
+        new MutationObserver(function () {
+            console.log('mutate');
+        }).observe(outer, { attributes: true });
 
-// Here's a click listener…
-function onClick() {
-  console.log('click');
-  setTimeout(function() {console.log('timeout');}, 0);
+        // Here's a click listener…
+        function onClick() {
+            console.log('click');
+            setTimeout(function () { console.log('timeout'); }, 0);
 
-  Promise.resolve().then(function() {console.log('promise');});
-  outer.setAttribute('data-random', Math.random());
-}
+            Promise.resolve().then(function () { console.log('promise'); });
+            outer.setAttribute('data-random', Math.random());
+        }
 
-// …which we'll attach to both elements
-inner.addEventListener('click', onClick);
-outer.addEventListener('click', onClick);
+        // …which we'll attach to both elements
+        inner.addEventListener('click', onClick);
+        outer.addEventListener('click', onClick);
 
-	</script>
+    </script>
 </body>
 
 </html>
