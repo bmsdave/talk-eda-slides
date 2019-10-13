@@ -49,8 +49,8 @@
                     <!-- 7 пунктов -->
                     <li><a href="#webservers">1. История веб-серверов</a></li>
                     <li><a href="#problems">2. Проблематика EDA</a></li>
-                    <li><a href="#eventloop">4. Циклы событий</a></li>
-                    <li><a href="#tools">5. Инструментарий</a></li>
+                    <li><a href="#eventloop">3. Циклы событий</a></li>
+                    <li><a href="#tools">4. Инструментарий</a></li>
                 </ul>
             </section>
             <section id="intro" data-background-image="./assets/1-red.jpg">
@@ -121,7 +121,7 @@
                 <section>
                     <h2>1999 г. c10k</h2>
                     <p>
-                        Ден Кегель, администратор FTP-сервера Simtel<br>
+                        Ден Кегель, администратор FTP-сервера Simtel,<br>
                         обозначил проблему c10k <a href="http://www.kegel.com/c10k.html">[1]</a>
                     </p>
                 </section>
@@ -134,19 +134,19 @@
                     </p>
                 </section>
                 <section>
-                    <h2>ngixn vs apache</h2>
+                    <h2>nginx vs apache</h2>
                     <div class="grid">
                         <img height="600px" class="grid_img" src="./assets/processing_requests.png"></img>
                     </div>
                 </section>
                 <section>
-                    <h2>ngixn vs apache</h2>
+                    <h2>nginx vs apache</h2>
                     <div class="grid">
                         <img class="grid_img" src="./assets/nginx_apache_timeline.jpg"></img>
                     </div>
                 </section>
                 <section>
-                    <h2>ngixn vs apache</h2>
+                    <h2>nginx vs apache</h2>
                     <div class="grid">
                         <img class="grid_img" src="./assets/nginx_apache_usage.jpg"></img>
                     </div>
@@ -253,8 +253,8 @@ user.test('a'.repeat(25) + "!"); // 0ms
 user.test('a'.repeat(30) + "!"); // 0ms</code></pre>
                 </section>
                 <section>
-					<h2>3. Падение очереди на обработке одного события</h2>
-					<p class="fragment fade-down">Обязывает реализовывать "retry"</p>
+                    <h2>3. Падение очереди на обработке одного события</h2>
+                    <p class="fragment fade-down">Обязывает реализовывать "retry"</p>
                 </section>
                 <section>
                     <h2>Проблемы EDA</h2>
@@ -291,7 +291,7 @@ user.test('a'.repeat(30) + "!"); // 0ms</code></pre>
   }</code></pre>
                 </section>
                 <section>
-                    <h2>Как вы думаете где в libuv реализация microtasks и nextTick?</h2>
+                    <h2>Как вы думаете, где в libuv реализация microtasks и nextTick?</h2>
                 </section>
                 <section>
                     <h2>Что можно заметить</h2>
@@ -361,20 +361,15 @@ user.test('a'.repeat(30) + "!"); // 0ms</code></pre>
             task.execute();
         }
         eventLoop.executeMicrotasks();
-        if (eventLoop.needsRendering())
+        if (eventLoop.needsRendering()){
             eventLoop.render();
+        }
     }</code></pre>
                 </section>
                 <section>
                     <h2>nextTask</h2>
                     <pre><code  class="hljs">
     nextTask: function() {
-        // Spec says:
-        // "Select the oldest task on one
-        // of the event loop's task queues"
-        // Which gives browser
-        // implementers lots of freedom
-        // Queues can have different priorities, etc.
         for (let q of taskQueues)
             if (q.length > 0)
                 return q.shift();
@@ -414,9 +409,9 @@ user.test('a'.repeat(30) + "!"); // 0ms</code></pre>
                     <video src="./assets/different_st_raf_qt.webm" autoplay controls muted></video>
                 </section> -->
             </section>
-            <section id="puzlers" data-background-image="./assets/3-green.jpg">
+            <section id="puzzlers" data-background-image="./assets/3-green.jpg">
                 <section>
-                    <h2>puzlers</h2>
+                    <h2>puzzlers</h2>
                 </section>
                 <section>
                     <div id="outer"
@@ -494,7 +489,7 @@ button.addEventListener('click', () => {
                     <h2>tools</h2>
                 </section>
                 <section>
-                    <h2><a href="https://github.com/libuv/libuv/pull/1764">1764</a></h2>
+                    <h2><a href="https://github.com/libuv/libuv/pull/1764">#1764</a></h2>
                     <img height="300px" src="./assets/1764.png"></img>
                 </section>
                 <section>
@@ -743,49 +738,49 @@ requests: []
             </section>
             <section id="solution" data-background-image="./assets/4-blue.jpg">
                 <section>
-					<h2>fuzzing</h2>
-					<p>Что бы решить проблему, нужно ее найти</p>
+                    <h2>fuzzing</h2>
+                    <p>Чтобы решить проблему, нужно ее найти</p>
                 </section>
-				<section>
-					<h2>Demo API login+pass</h2>
-				</section>
                 <section>
-					<h2>TODO: requests</h2>
-					<pre>
+                    <h2>Demo API login+pass</h2>
+                </section>
+                <section>
+                    <h2>TODO: requests</h2>
+                    <pre>
 $ node ./attaker.js 
 v7 917
 v7_wrong 40
 v7_wrong2 39
-					</pre>
-				</section>
-				<section>
-						<h2>TODO: таким образом мы познакомились с тайминговыми атаками</h2>
-					</section>
+                    </pre>
+                </section>
+                <section>
+                        <h2>TODO: таким образом мы познакомились с тайминговыми атаками</h2>
+                    </section>
                 <section>
                     <h2>TODO: загрузить event loop запросами чтобы он не мог отвечать и показать как будет вести себя интерфейс</h2>
-				</section>
-				<section>
-						<h2>TODO: выводы о примере и решение</h2>
-						<ul>
-							<li>1. полностью обезопасить себя от отравлении не получится</li>
-							<li>2. мотивация для использования load balancer и горизонтальное маштабирование</li>
-						</ul>
-				</section>
-				<section>
-					<h2>Кстати, для клиентского fuzzing</h2>
-					<div class="grid">
-							<img class="grid_img" src="./assets/gremlins.gif"></img>
-					</div>
-				</section>
-				<section>
-						<h2>Кстати, для клиентского fuzzing</h2>
-						<pre><code>
+                </section>
+                <section>
+                        <h2>TODO: выводы о примере и решение</h2>
+                        <ul>
+                            <li>1. полностью обезопасить себя от отравления не получится</li>
+                            <li>2. мотивация для использования load balancer и горизонтальное маштабирование</li>
+                        </ul>
+                </section>
+                <section>
+                    <h2>Кстати, для клиентского fuzzing</h2>
+                    <div class="grid">
+                            <img class="grid_img" src="./assets/gremlins.gif"></img>
+                    </div>
+                </section>
+                <section>
+                        <h2>Кстати, для клиентского fuzzing</h2>
+                        <pre><code>
 var horde = gremlins.createHorde();
 horde.unleash();
 // gremlins will act randomly,
 // at 10 ms interval, 1000 times
-						</code></pre>
-				</section>
+                        </code></pre>
+                </section>
             </section>
             <section>
                 <h2>Выводы</h2>
@@ -854,12 +849,12 @@ horde.unleash();
         const button = document.getElementById('test5');
 
         button.addEventListener('click', () => {
-            Promise.resolve().then(() => console.log('microtask 1'));
+            Promise.resolve().then(() => console.log('mtask 1'));
             console.log('listener 1')
         });
 
         button.addEventListener('click', () => {
-            Promise.resolve().then(() => console.log('microtask 2'));
+            Promise.resolve().then(() => console.log('mtask 2'));
             console.log('listener 2')
         })
 
