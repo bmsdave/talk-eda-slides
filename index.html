@@ -44,16 +44,18 @@
                 </div>
             </section>
             <section data-background-image="./assets/0-plan.jpg">
-                <h2>План доклада:</h2>
-                <ul>
+                <ul style="margin: 0;">
                     <!-- 7 пунктов -->
-                    <li><a href="#webservers">1. История веб-серверов</a></li>
-                    <li><a href="#problems">2. Проблематика EDA</a></li>
-                    <li><a href="#eventloop">3. Циклы событий</a></li>
-                    <li><a href="#tools">4. Инструментарий</a></li>
+                    <li><a class="plan plan-1" href="#intro">1. История</a></li>
+                    <li><a class="plan plan-2" href="#problems">2. Проблематика</a></li>
+                    <li><a class="plan plan-3" href="#libuv">3. Event loop</a></li>
+                    <li><a class="plan plan-4" href="#tools">4. Tools</a></li>
                 </ul>
             </section>
-            <section id="intro" data-background-image="./assets/1-red.jpg">
+			<section id="intro" data-background-image="./assets/1-red.jpg">
+				<section>
+					<h2>1. История</h2>
+				</section>
                 <section>
                     <h2>Event-Driven Architecture</h2>
                     <p>берет начало в 1970-e</p>
@@ -73,7 +75,7 @@
                     </ul>
                 </section>
             </section>
-            <section id="webservers" data-background-image="./assets/1-red.jpg">
+			<section id="webservers" data-background-image="./assets/1-red.jpg">
                 <section data-state="apache_history" data-background-image="./assets/star-wars-background.jpg">
                     <div class="star-wars">
                         <div id="crawl">
@@ -166,10 +168,10 @@
                     </ul>
                 </section>
             </section>
-            <section id="problems" data-background-image="./assets/2-orange.jpg">
-                <section>
-                    <h2>Проблемы EDA</h2>
-                </section>
+			<section id="problems" data-background-image="./assets/2-orange.jpg">
+				<section>
+						<h2>2. Проблемы</h2>
+				</section>
                 <section>
                     <h2>1. Проблемы удобства</h2>
                     <div class="fragment fade-down grid">
@@ -265,7 +267,10 @@ user.test('a'.repeat(30) + "!"); // 0ms</code></pre>
                     </ul>
                 </section>
             </section>
-            <section id="libuv" data-background-image="./assets/3-green.jpg">
+			<section id="libuv" data-background-image="./assets/3-green.jpg">
+				<section>
+						<h2>3. event loop</h2>
+				</section>
                 <section>
                     <h2><a href="https://github.com/libuv/libuv/wiki/Projects-that-use-libuv">[4]</a>libuv <img
                             height="160px" src="./assets/libuv.png"></img></h2>
@@ -396,12 +401,227 @@ user.test('a'.repeat(30) + "!"); // 0ms</code></pre>
                     <h2>Все ли придерживаются спеки? <span class="fragment fade-down">Почти</span></h2>
                 </section>
                 <section>
-                    <h2>whatwg support <a href="https://cdn.rawgit.com/atotic/event-loop/caa3cfd4/shell.html">[7]</a>
+                    <h2>whatwg support 2015 <a href="https://cdn.rawgit.com/atotic/event-loop/caa3cfd4/shell.html">[7]</a>
                     </h2>
                     <div class="grid">
-                        <img class="grid_img" src="./assets/whatwg_support.png"></img>
+							<table>
+									<thead>
+										<tr><td>Standard</td><td>Chrome</td><td>Safari</td><td>Edge</td><td>Firefox</td></tr>
+									</thead>
+									<tbody id="testTable">
+										<tr>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+										</tr>
+										<tr>
+											<td class="scriptend">script end</td>
+											<td class="scriptend">script end</td>
+											<td class="scriptend">script end</td>
+											<td class="scriptend">script end</td>
+											<td class="animationstart">animationstart</td>
+										</tr>
+										<tr>
+											<td class="promisea">promise A</td>
+											<td class="promisea">promise A</td>
+											<td class="promisea">promise A</td>
+											<td class="promisea">promise A</td>
+											<td class="scriptend">script end</td>
+										</tr>
+										<tr>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+										</tr>
+										<tr>
+											<td class="promiseb">promise B</td>
+											<td class="promiseb">promise B</td>
+											<td class="timeouta">timeout A</td>
+											<td class="promiseb">promise B</td>
+											<td class="scroll">scroll</td>
+										</tr>
+										<tr>
+											<td class="timeouta">timeout A</td>
+											<td class="timeouta">timeout A</td>
+											<td class="timeoutb">timeout B</td>
+											<td class="timeouta">timeout A</td>
+											<td class="matchmedia">matchMedia</td>
+										</tr>
+										<tr>
+											<td class="timeoutb">timeout B</td>
+											<td class="timeoutb">timeout B</td>
+											<td class="scroll">scroll</td>
+											<td class="timeoutb">timeout B</td>
+											<td class="resize">resize</td>
+										</tr>
+										<tr>
+											<td class="resize">resize</td>
+											<td class="scroll">scroll</td>
+											<td class="promiseb">promise B</td>
+											<td class="animationstart">animationstart</td>
+											<td class="promisea">promise A</td>
+										</tr>
+										<tr>
+											<td class="scroll">scroll</td>
+											<td class="matchmedia">matchMedia</td>
+											<td class="matchmedia">matchMedia</td>
+											<td class="scroll">scroll</td>
+											<td class="promiseb">promise B</td>
+										</tr>
+										<tr>
+											<td class="matchmedia">matchMedia</td>
+											<td class="resize">resize</td>
+											<td class="animationstart">animationstart</td>
+											<td class="rafa">rAF A</td>
+											<td class="timeouta">timeout A</td>
+										</tr>
+										<tr>
+											<td class="animationstart">animationstart</td>
+											<td class="animationstart">animationstart</td>
+											<td class="resize">resize</td>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="timeoutb">timeout B</td>
+										</tr>
+										<tr>
+											<td class="rafa">rAF A</td>
+											<td class="rafa">rAF A</td>
+											<td class="rafa">rAF A</td>
+											<td class="rafb">rAF B</td>
+											<td class="rafa">rAF A</td>
+										</tr>
+										<tr>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="matchmedia">matchMedia</td>
+											<td class="rafb">rAF B</td>
+										</tr>
+										<tr>
+											<td class="rafb">rAF B</td>
+											<td class="rafb">rAF B</td>
+											<td class="rafb">rAF B</td>
+											<td class="resize">resize</td>
+											<td class="rafapromise">rAF A promise</td>
+										</tr>
+									</tbody>
+								</table>	
                     </div>
-                </section>
+				</section>
+				<section>
+						<h2>whatwg support 2019 <a href="https://cdn.rawgit.com/atotic/event-loop/caa3cfd4/shell.html">[7]</a>
+						</h2>
+						<div class="grid">
+							<table>
+									<thead>
+										<tr><td>Standard</td><td>Chrome</td><td>Safari</td><td>Edge</td><td>Firefox</td></tr>
+									</thead>
+									<tbody id="testTable">
+										<tr>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+											<td class="scriptstart">script start</td>
+										</tr>
+										<tr>
+											<td class="scriptend">script end</td>
+											<td class="scriptend">script end</td>
+											<td class="scriptend">script end</td>
+											<td class="scriptend">script end</td>
+											<td class="scriptend">script end</td>
+										</tr>
+										<tr>
+											<td class="promisea">promise A</td>
+											<td class="promisea">promise A</td>
+											<td class="promisea">promise A</td>
+											<td class="promisea">promise A</td>
+											<td class="promisea">promise A</td>
+										</tr>
+										<tr>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+											<td class="mutate">mutate</td>
+										</tr>
+										<tr>
+											<td class="promiseb">promise B</td>
+											<td class="promiseb">promise B</td>
+											<td class="promiseb">promise B</td>
+											<td class="promiseb">promise B</td>
+											<td class="promiseb">promise B</td>
+										</tr>
+										<tr>
+											<td class="timeouta">timeout A</td>
+											<td class="timeouta">timeout A</td>
+											<td class="matchmedia">matchMedia</td>
+											<td class="timeouta">timeout A</td>
+											<td class="matchmedia">matchMedia</td>
+										</tr>
+										<tr>
+											<td class="timeoutb">timeout B</td>
+											<td class="timeoutb">timeout B</td>
+											<td class="timeouta">timeout A</td>
+											<td class="timeoutb">timeout B</td>
+											<td class="timeouta">timeout A</td>
+										</tr>
+										<tr>
+											<td class="resize">resize</td>
+											<td class="scroll">scroll</td>
+											<td class="timeoutb">timeout B</td>
+											<td class="scroll">scroll</td>
+											<td class="timeoutb">timeout B</td>
+										</tr>
+										<tr>
+											<td class="scroll">scroll</td>
+											<td class="matchmedia">matchMedia</td>
+											<td class="scroll">scroll</td>
+											<td class="matchmedia">matchMedia</td>
+											<td class="resize">resize</td>
+										</tr>
+										<tr>
+											<td class="matchmedia">matchMedia</td>
+											<td class="resize">resize</td>
+											<td class="resize">resize</td>
+											<td class="resize">resize</td>
+											<td class="scroll">scroll</td>
+										</tr>
+										<tr>
+											<td class="animationstart">animationstart</td>
+											<td class="animationstart">animationstart</td>
+											<td class="animationstart">animationstart</td>
+											<td class="animationstart">animationstart</td>
+											<td class="animationstart">animationstart</td>
+										</tr>
+										<tr>
+											<td class="rafa">rAF A</td>
+											<td class="rafa">rAF A</td>
+											<td class="rafa">rAF A</td>
+											<td class="rafa">rAF A</td>
+											<td class="rafa">rAF A</td>
+										</tr>
+										<tr>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="rafapromise">rAF A promise</td>
+											<td class="rafapromise">rAF A promise</td>
+										</tr>
+										<tr>
+											<td class="rafb">rAF B</td>
+											<td class="rafb">rAF B</td>
+											<td class="rafb">rAF B</td>
+											<td class="rafb">rAF B</td>
+											<td class="rafb">rAF B</td>
+										</tr>
+									</tbody>
+								</table>	
+						</div>
+				</section>
                 <!-- <section>
                     <video src="./assets/chrome_tasks_run.webm" autoplay controls muted></video>
                 </section>
@@ -434,16 +654,16 @@ outer.addEventListener('click', onClick);</code></pre>
                 </section>
                 <section>
                     <h2>Ожидания</h2>
-                    <ul>
-                        <li>click</li>
-                        <li>promise</li>
-                        <li>mutate</li>
-                        <li>click</li>
-                        <li>promise</li>
-                        <li>mutate</li>
-                        <li>timeout</li>
-                        <li>timeout</li>
-                    </ul>
+                    <table>
+                        <tr><td>click</td></tr>
+                        <tr><td>promise</td></tr>
+                        <tr><td>mutate</td></tr>
+                        <tr><td>click</td></tr>
+                        <tr><td>promise</td></tr>
+                        <tr><td>mutate</td></tr>
+                        <tr><td>timeout</td></tr>
+						<tr><td>timeout</td></tr>
+					</table>
                 </section>
                 <section>
                     <h2 class="fragment fade-down">2015г.</h2>
@@ -453,16 +673,16 @@ outer.addEventListener('click', onClick);</code></pre>
                 </section>
                 <section>
                     <h2>2019г.</h2>
-                    <ul>
-                        <li>click</li>
-                        <li>promise</li>
-                        <li>mutate</li>
-                        <li>click</li>
-                        <li>promise</li>
-                        <li>mutate</li>
-                        <li>timeout</li>
-                        <li>timeout</li>
-                    </ul>
+                    <table>
+							<tr><td>click</td></tr>
+							<tr><td>promise</td></tr>
+							<tr><td>mutate</td></tr>
+							<tr><td>click</td></tr>
+							<tr><td>promise</td></tr>
+							<tr><td>mutate</td></tr>
+							<tr><td>timeout</td></tr>
+							<tr><td>timeout</td></tr>
+						</table>
                 </section>
                 <section>
                     <h2>Пример с тестами и <button style="font-size: 64px" id="test5">button.click()</button></h2>
@@ -486,7 +706,7 @@ button.addEventListener('click', () => {
             </section>
             <section id="tools" data-background-image="./assets/4-blue.jpg">
                 <section>
-                    <h2>tools</h2>
+                    <h2>4. tools</h2>
                 </section>
                 <section>
                     <h2><a href="https://github.com/libuv/libuv/pull/1764">#1764</a></h2>
@@ -745,25 +965,17 @@ requests: []
                     <h2>Demo API login+pass</h2>
                 </section>
                 <section>
-                    <h2>TODO: requests</h2>
-                    <pre>
-$ node ./attaker.js 
-v7 917
-v7_wrong 40
-v7_wrong2 39
-                    </pre>
+                    <h2>С v7 что-то не так</h2>
                 </section>
                 <section>
-                        <h2>TODO: таким образом мы познакомились с тайминговыми атаками</h2>
+                        <h2>Таким образом мы познакомились с тайминговыми атаками</h2>
                     </section>
                 <section>
-                    <h2>TODO: загрузить event loop запросами чтобы он не мог отвечать и показать как будет вести себя интерфейс</h2>
-                </section>
-                <section>
-                        <h2>TODO: выводы о примере и решение</h2>
+                        <h2>выводы об отравлении</h2>
                         <ul>
-                            <li>1. полностью обезопасить себя от отравления не получится</li>
-                            <li>2. мотивация для использования load balancer и горизонтальное маштабирование</li>
+                            <li>1. влияет на всю очередь</li>
+							<li>2. подход 1 соединение -> 1 процесс лучше себя ведет</li>
+							<li>3. time-attack является "инверсией" redos</li>
                         </ul>
                 </section>
                 <section>
@@ -773,12 +985,16 @@ v7_wrong2 39
                     </div>
                 </section>
                 <section>
-                        <h2>Кстати, для клиентского fuzzing</h2>
-                        <pre><code>
-var horde = gremlins.createHorde();
-horde.unleash();
-// gremlins will act randomly,
-// at 10 ms interval, 1000 times
+                        <pre><code class="hgjs">
+gremlins.createHorde()
+  .gremlin(gremlins.species.formFiller())
+  .gremlin(gremlins.species.clicker()
+  	.clickTypes(['click']))
+  .gremlin(gremlins.species.scroller())
+  .gremlin(function() {
+    window.$ = function() {};
+  })
+  .unleash();
                         </code></pre>
                 </section>
             </section>
@@ -788,11 +1004,12 @@ horde.unleash();
                     <li class="fragment fade-down">1. EDA принесла не только производительность, но и проблемы</li>
                     <li class="fragment fade-down">2. Некоторые операции могут неожиданно заблокировать поток (ReDos)</li>
                     <li class="fragment fade-down">3. Реализации event loop "похожи"</li>
-                    <li class="fragment fade-down">4. Есть необходимость в инструментах</li>
+					<li class="fragment fade-down">4. Есть необходимость в инструментах</li>
+					<li class="fragment fade-down">5. отравляющие артефакты могут быть нетривиальны</li>
                 </ul>
             </section>
             <section>
-                <h2>список литературы</h2>
+                <h2>Список литературы</h2>
                 <ul>
                     <li><a href="http://www.kegel.com/c10k.html">[1] The C10K problem</a></li>
                     <li><a href="https://habr.com/ru/post/260669/">[2] Пулы потоков: ускоряем NGINX в 9 и более раз</a>
@@ -810,7 +1027,12 @@ horde.unleash();
                 </ul>
             </section>
             <section>
-                <h2>Спасибо!</h2>
+				<h2>Спасибо!</h2>
+				<ul>
+						<li>Вадим Горбачев</li>
+						<li>twitter: @_bmsdave</li>
+						<li>@bmsdave</li>
+					</ul>
             </section>
         </div>
     </div>
@@ -832,7 +1054,7 @@ horde.unleash();
                 { src: 'plugin/reveal-alt-arrows/alt-arrows.js' },
                 { src: 'plugin/notes/notes.js', async: true },
                 { src: 'plugin/highlight/highlight.js', async: true },
-
+				{ src: 'plugin/gremlins/gremlins.min.js'},
                 // custom plugins
                 // { src: 'plugin/bmsdave/bundle.js', async: true },
                 { src: 'plugin/typed/typed.js', async: false, callback: function () { callTypedJs(); } },

@@ -30,3 +30,59 @@
 .reveal .h200 {
   height: 200px;
 }
+
+#testTable {
+  font-size: 0.6em;
+}
+
+.scriptstart {
+  background-color: rgba(100, 100, 100);
+}
+.scriptend {
+  background-color: rgba(100, 100, 100);
+}
+.promisea {
+  background-color: rgba(0, 0, 100);
+}
+.mutate {
+  background-color: rgba(0, 0, 100);
+}
+.promiseb {
+  background-color: rgba(0, 0, 100);
+}
+.timeouta {
+  background-color: rgba(100, 100, 0);
+}
+.timeoutb {
+  background-color: rgba(100, 100, 0);
+}
+.resize {
+  background-color: rgba(0, 100, 0);
+}
+.scroll {
+  background-color: rgba(0, 100, 0);
+}
+.matchmedia {
+  background-color: rgba(0, 100, 0);
+}
+.animationstart {
+  background-color: rgba(0, 100, 0);
+}
+.rafa {
+  background-color: rgba(100, 100, 0);
+}
+.rafapromise {
+  background-color: rgba(100, 100, 0);
+}
+.rafb {
+  background-color: rgba(100, 100, 0);
+}
+
+.reveal a.plan {
+    color: white;
+}
+
+.reveal a.plan-1 {padding: 0 0 0 0;}
+.reveal a.plan-2 {padding: 0 0 0 340px;}
+.reveal a.plan-3 {padding: 0 0 0 780px;}
+.reveal a.plan-4 {padding: 0 0 0 1210px;}
